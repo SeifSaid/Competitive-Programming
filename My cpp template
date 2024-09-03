@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+#define XTRABYTE ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);cout<<setiosflags(ios::fixed)<<setprecision(15);
+using ll = long long;
+using ld = long double;
+#define all(a) (a).begin(),(a).end()
+#define allr(a) (a).rbegin(),(a).rend()
+#define mp make_pair
+#define pb push_back
+#define rep(i,n,m) for(ll i = (n); i < (ll)(m); i++)
+#define rrep(i,n,m) for(ll i = (ll)(m) - 1; i >= (ll)(n); i--)
+#define no cout<<"NO"<<"\n";
+#define yes cout<<"YES"<<"\n";
+const ll MOD = 1e9+7;
+const ld pi = 3.1415926535897932384626433832795;
+
+//Comparators
+auto comp11= [](const auto &x, const auto &y) {
+        return x.first < y.first;
+    };
+auto comp12= [](const auto &x, const auto &y) {
+        return x.first > y.first;
+    };
+auto comp21= [](const auto &x, const auto &y) {
+        return x.second < y.second;
+    };
+auto comp22= [](const auto &x, const auto &y) {
+        return x.second > y.second;
+    };
+using gint = greater<int>;
+
+void solve(){
+
+    
+}
+
+signed main(){
+XTRABYTE;
+int _;
+_=1; 
+//cin>>_;
+
+while(_--)
+{
+   solve();
+}
+return 0;
+}
