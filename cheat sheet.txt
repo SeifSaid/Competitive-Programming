@@ -84,7 +84,11 @@ auto comp21= [](const auto &x, const auto &y) {
 auto comp22= [](const auto &x, const auto &y) {
         return x.second > y.second;
     };
+
 //sort(v.begin(), v.end(), greater<int>()); 
+//bool is_sorted(iterator first, iterator last);
+// bool is_sorted(iterator first, iterator last, comp);
+
 
 //GCD & LCM
 int gcd(int a, int b) {
@@ -196,8 +200,12 @@ vector<int> manacher(string s) {
 
 
 getline(cin,s); //te5o string m3a les espaces
+
 swap(v, new_v); //ti9leb 2 vectors
+
 fill(v.begin(), v.end(), 0); //t3abi vector
+memset(a, 0, sizeof(a));
+
 s.rfind('A')-s.find('A')+1 //first and last occ
 
 for (auto it = v.begin(); it != v.end(); ++it)
@@ -257,3 +265,47 @@ builtin_popcountl(n) (long long)
 
 //Set Nth bit to 1 
 x |= (1<<n)
+
+// when the number is too large. use powl instead of pow.
+// will provide you more accuracy.
+powl(a, b)
+(int)round(p, (1.0/n)) // nth root of p
+
+bool next_permutation(iterator first, iterator last);
+
+bool prev_permutation(iterator first, iterator last)
+
+// there are 25 prime numbers under 100
+ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37,
+ 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+
+//Leap year
+ bool isLeap(int n)
+ {
+ if (n%100==0)
+ if (n%400==0) return true;
+ else return false;
+ if (n%4==0) return true;
+ else return false;
+ }
+
+//Find rank k in array
+ int find(int l, int r, int k)
+ {
+ int i=0,j=0,x=0,t=0;
+ if (l==r) return a[l];
+ x=a[(l+r)/2];
+ t=a[x]; a[x]=a[r]; a[r]=t;
+ i=l-1;
+ for (int j=l; j<=r-1;j++)
+ if (a[j]<=a[r])
+ {
+ i++;
+ t=a[i]; a[i]=a[j]; a[j]=t;
+ }
+ i++;
+ t=a[i]; a[i]=a[r]; a[r]=t;
+ if (i==k) return a[i];
+}
+ if (i<k) return find(i+1, r,k);
+ return find(l, i-1, k);
