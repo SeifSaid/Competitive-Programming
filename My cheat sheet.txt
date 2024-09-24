@@ -85,6 +85,34 @@ auto comp22= [](const auto &x, const auto &y) {
         return x.second > y.second;
     };
 
+//Count divisors with prime factorisation
+int count_divisors(int n) {
+    int divisors = 1;
+    // Check div by 2
+    int count = 0;
+    while (n % 2 == 0) {
+        n /= 2;
+        count++;
+    }
+    divisors *= (count + 1);
+    // Check div by odds up to sqrt(n)
+    for (int i = 3; i * i <= n; i += 2) {
+        count = 0;
+        while (n % i == 0) {
+            n /= i;
+            count++;
+        }
+        divisors *= (count + 1);
+    }
+    // If n is still greater than 1, then it's a prime factor
+    if (n > 1) {
+        divisors *= 2;
+    }
+    return divisors;
+}
+
+
+
 //sort(v.begin(), v.end(), greater<int>()); 
 //bool is_sorted(iterator first, iterator last);
 // bool is_sorted(iterator first, iterator last, comp);
