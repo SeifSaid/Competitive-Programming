@@ -1,0 +1,57 @@
+a+(~a)+1=2^i
+a+b = 2*(a&b) + (a^b)
+i & -i = lowest activated bit 40&(-40)=8
+***
+XOR
+x ^ 0 = x
+x ^ x = 0
+a ^ b = c
+a ^ c = b
+b ^ c = a
+***
+MOD 2^n
+x & (1<<n -1) = x % (1<<n)
+***
+Nth bit of x
+(x>>n)&1
+***
+X power of 2
+x & (x-1) == 0 
+***
+Count number of 1's
+builtin_popcount(n)
+builtin_popcountl(n)
+***
+GetBitN 
+(x>>n)&1
+***
+SetBitN
+x |= (1<<n)
+***
+UnsetBitN
+x &= ~(1<<n);
+***
+ToggleBitN
+x ^= (1<<n);
+
+//Binary Rep
+void printBinary(int x) {
+    for (int i = 31; i >= 0; --i) {
+        cout << ((x >> i) & 1);
+    }
+    cout << endl;
+}
+
+//Genarate all subsets
+void generateSubsets(vector<int>& nums) {
+    int n = nums.size();
+    for (int mask = 0; mask < (1 << n); ++mask) {
+        for (int i = 0; i < n; ++i) {
+            if (mask & (1 << i)) {
+                // nums[i] is in the subset
+            }
+        }
+    }
+}
+
+

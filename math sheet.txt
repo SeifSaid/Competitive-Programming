@@ -1,0 +1,136 @@
+// Extended GCD: Finds gcd(a, b), and x, y such that ax + by = gcd(a, b)
+int extended_gcd(int a, int b, int &x, int &y) {
+    if (b == 0) {
+        x = 1; y = 0;
+        return a;
+    }
+    int x1, y1;
+    int gcd = extended_gcd(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - (a / b) * y1;
+    return gcd;
+}
+
+// Solves a * x ≡ b (mod m) and returns x or -1 if no solution exists
+int mod_linear_solver(int a, int b, int m) {
+    int x, y;
+    int g = extended_gcd(a, m, x, y);
+    if (b % g != 0) return -1; // No solution
+    x = (x * (b / g)) % m;
+    if (x < 0) x += m;
+    return x;
+}
+
+//Matrix Exponentiation
+vector<vector<ll>> mat_mult(const vector<vector<ll>> &a, const vector<vector<ll>> &b, ll mod) {
+    int n = a.size(), m = b[0].size(), p = b.size();
+    vector<vector<ll>> res(n, vector<ll>(m, 0));
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < m; ++j)
+            for (int k = 0; k < p; ++k)
+                res[i][j] = (res[i][j] + a[i][k] * b[k][j] % mod) % mod;
+    return res;
+}
+vector<vector<ll>> mat_expo(vector<vector<ll>> base, ll exp, ll mod) {
+    int n = base.size();
+    vector<vector<ll>> res(n, vector<ll>(n, 0));
+    for (int i = 0; i < n; ++i) res[i][i] = 1; // Identity matrix
+    while (exp) {
+        if (exp % 2) res = mat_mult(res, base, mod);
+        base = mat_mult(base, base, mod);
+        exp /= 2;
+    }
+    return res;
+}
+
+//Fast Prime Factorization (Using Sieve for Smallest Prime Factors)
+vector<int> spf; // Smallest prime factor for every number
+void precompute_spf(int n) {
+    spf.resize(n + 1);
+    for (int i = 1; i <= n; ++i) spf[i] = i;
+    for (int p = 2; p * p <= n; ++p) {
+        if (spf[p] == p) {
+            for (int i = p * p; i <= n; i += p)
+                if (spf[i] == i) spf[i] = p;
+        }
+    }
+}
+//Factorizes a number in O(log n)
+vector<int> fast_prime_factors(int x) {
+    vector<int> factors;
+    while (x != 1) {
+        factors.push_back(spf[x]);
+        x /= spf[x];
+    }
+    return factors;
+}
+
+//Modular Exponentiation for Large Bases
+ll large_base_mod_exp(ll a, ll b, ll mod) {
+    a %= mod;
+    ll result = 1;
+    while (b > 0) {
+        if (b % 2 == 1) result = (result * a) % mod;
+        a = (a * a) % mod;
+        b /= 2;
+    }
+    return result;
+}
+
+//Calculate φ(n)
+//Euler's Totient Function, denoted as ϕ(n), is a function that counts the number of integers from 1 to n that are coprime with n (i.e., numbers k such that gcd(k,n)=1).
+int euler_totient(int n) {
+    int result = n;
+    for (int p = 2; p * p <= n; ++p) {
+        if (n % p == 0) {
+            while (n % p == 0) n /= p;
+            result -= result / p;
+        }
+    }
+    if (n > 1) result -= result / n;
+    return result;
+}
+
+//Precomputing ϕ(n) for All Numbers up to MAXN
+vector<int> compute_totients(int maxn) {
+    vector<int> phi(maxn + 1);
+    for (int i = 0; i <= maxn; ++i) phi[i] = i; // Initialize phi[i] = i
+
+    for (int p = 2; p <= maxn; ++p) {
+        if (phi[p] == p) { // p is a prime
+            for (int i = p; i <= maxn; i += p) {
+                phi[i] -= phi[i] / p; // Subtract multiples of p
+            }
+        }
+    }
+    return phi;
+}
+
+//Chinese Remainder Theorem
+//x=a1[n1]
+//x=a2[n2]
+//x=a3[n3]
+//  ...
+//x=ak[nk]
+//has a unique solution modulo N=n1*n2*n3*...*nk
+ll chinese_remainder_theorem(const vector<ll> &remainders, const vector<ll> &mods) {
+    ll product = 1, result = 0;
+    int n = mods.size();
+    for (int i = 0; i < n; ++i) product *= mods[i];
+    for (int i = 0; i < n; ++i) {
+        ll pp = product / mods[i];
+        result = (result + remainders[i] * inv(pp, mods[i]) % product * pp % product) % product;
+    }
+    return (result + product) % product;
+}
+
+
+//Simplified Two-Moduli CRT
+//only n1 & n2
+ll crt_two(ll a1, ll n1, ll a2, ll n2) {
+    ll N = n1 * n2;
+    ll N1 = n2, N2 = n1;
+    ll M1 = inv(N1, n1); // Modular inverse of N1 mod n1
+    ll M2 = inv(N2, n2); // Modular inverse of N2 mod n2
+    return ((a1 * N1 % N * M1 % N) + (a2 * N2 % N * M2 % N)) % N;
+}

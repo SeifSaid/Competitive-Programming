@@ -1,0 +1,124 @@
+//Kadane's Algorithm (Max sum of subarray)
+long long mx = 0;
+long long curr = 0;
+for (long long num : a) {
+    curr = num > curr + num ? num : curr + num;
+    mx = mx > curr ? mx : curr ;
+}
+
+//erase from set/multiset
+auto it = mySet.find(3);
+if (it != mySet.end()) mySet.erase(it);
+
+
+//2D prefix sum
+vector<vector<T>>prefix(int(v.size())+1, vector<T>(int(v[0].size())+1));
+for (int i=0; i<int(v.size()); i++) {
+    for (int j=0; j<int(v[0].size()); j++) 
+		prefix[i+1][j+1] = prefix[i+1][j] + prefix[i][j+1] - prefix[i][j] + v[i][j];
+}
+
+int res = prefix[r1+1][r2+1] - prefix[l1][r2+1] - prefix[r1+1][l2] + prefix[l1][l2];
+
+//Range Min (sparse table)
+const int MAX_N = 200000;
+const int LOG = 18;
+int a[MAX_N];
+int m[MAX_N][LOG]; 
+int bin_log[MAX_N];
+int query(int L, int R) {
+	int length = R - L + 1;
+	int k = bin_log[length];
+	return min(m[L][k], m[R-(1<<k)+1][k]);
+}
+int main() {
+	int n;
+	cin >> n;
+	int q;
+	cin >> q;
+	bin_log[1] = 0;
+	for(int i = 2; i <= n; i++) {
+		bin_log[i] = bin_log[i/2]+1;
+	}
+	for(int i = 0; i < n; i++) {
+		cin >> a[i];
+		m[i][0] = a[i];
+	}
+	for(int k = 1; k < LOG; k++) {
+		for(int i = 0; i + (1 << k) - 1 < n; i++) {
+			m[i][k] = min(m[i][k-1], m[i+(1<<(k-1))][k-1]);
+		}
+	}
+	
+	for(int i = 0; i < q; i++) {
+		int L, R;
+		cin >> L >> R;
+		cout << query(L-1, R-1) << "\n";
+	}
+	return 0;
+}
+
+
+//count cycles between 2 permutations
+int count_cycles(int n, const vector<int>& a, const vector<int>& b) {
+    // Create a mapping from a[i] to b[i]
+    unordered_map<int, int> mapping;
+    for (int i = 0; i < n; ++i) {
+        mapping[a[i]] = b[i];
+    }
+
+    unordered_set<int> visited; // To track visited nodes
+    int cycle_count = 0;
+
+    // Traverse all nodes
+    for (int i = 0; i < n; ++i) {
+        int start = a[i];
+        if (visited.count(start) == 0) { // If not visited
+            ++cycle_count; // Start a new cycle
+            int current = start;
+            // Traverse the cycle
+            while (visited.count(current) == 0) {
+                visited.insert(current);
+                current = mapping[current];
+            }
+        }
+    }
+
+    return cycle_count;
+}
+
+//k smallest element in an array
+int quickSelect(vector<int>& a, int l, int r, int k) {
+    // If the list has only one element, return it
+    if (l == r) return a[l];
+
+    // Choose a pivot (we choose the last element in this case)
+    int pivot = a[r];
+    int i = l - 1;
+
+    // Partition the array into two parts:
+    // Elements less than or equal to pivot, and elements greater than pivot
+    for (int j = l; j < r; j++) {
+        if (a[j] <= pivot) {
+            i++;
+            swap(a[i], a[j]);  // Swap elements that are smaller or equal to pivot to the left
+        }
+    }
+
+    // Place pivot in its correct position
+    swap(a[i + 1], a[r]);
+    int pivotIndex = i + 1;
+
+    // If the pivot is in the correct position (i.e., its rank is k), return it
+    if (pivotIndex == k) {
+        return a[pivotIndex];
+    }
+    // If k is greater, recursively search the right part
+    else if (pivotIndex < k) {
+        return quickSelect(a, pivotIndex + 1, r, k);
+    }
+    // If k is smaller, recursively search the left part
+    else {
+        return quickSelect(a, l, pivotIndex - 1, k);
+    }
+}

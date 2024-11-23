@@ -1,0 +1,199 @@
+const double EPS = 1e-9; // Precision threshold for floating-point comparisons
+const double PI = acos(-1.0); // Value of π
+
+//distance between 2 points
+double dist(double x1, double y1, double x2, double y2) {
+    return hypot(x1 - x2, y1 - y2); // sqrt((x1 - x2)^2 + (y1 - y2)^2)
+}
+
+//dot product
+double dot(double x1, double y1, double x2, double y2) {
+    return x1 * x2 + y1 * y2;
+}
+
+//cross product
+double cross(double x1, double y1, double x2, double y2) {
+    return x1 * y2 - y1 * x2;
+}
+
+//angle between 2 vectors
+double angle(double x1, double y1, double x2, double y2) {
+    return acos(dot(x1, y1, x2, y2) / (hypot(x1, y1) * hypot(x2, y2))); // In radians
+}
+
+//orientation of 3 points
+//1 for counterclockwise
+//−1 for clockwise
+//0 for collinear
+int orientation(double x1, double y1, double x2, double y2, double x3, double y3) {
+    double val = cross(x2 - x1, y2 - y1, x3 - x2, y3 - y2);
+    if (fabs(val) < EPS) return 0; // Collinear
+    return (val > 0) ? 1 : -1;     // CCW or CW
+}
+
+//Line Equation ax+by+c=0
+void lineEquation(double x1, double y1, double x2, double y2, double& a, double& b, double& c) {
+    a = y2 - y1;
+    b = x1 - x2;
+    c = -(a * x1 + b * y1);
+}
+
+//Distance from Point to Line
+double distPointToLine(double x, double y, double a, double b, double c) {
+    return fabs(a * x + b * y + c) / hypot(a, b);
+}
+
+//Intersection of Two Lines
+bool lineIntersection(double a1, double b1, double c1, 
+                      double a2, double b2, double c2,
+                      double& x, double& y) {
+    double det = a1 * b2 - a2 * b1;
+    if (fabs(det) < EPS) return false; // Lines are parallel or coincident
+    x = (b2 * c1 - b1 * c2) / det;
+    y = (a1 * c2 - a2 * c1) / det;
+    return true;
+}
+
+//Check if Two Segments Intersect
+bool segmentsIntersect(double x1, double y1, double x2, double y2,
+                       double x3, double y3, double x4, double y4) {
+    int o1 = orientation(x1, y1, x2, y2, x3, y3);
+    int o2 = orientation(x1, y1, x2, y2, x4, y4);
+    int o3 = orientation(x3, y3, x4, y4, x1, y1);
+    int o4 = orientation(x3, y3, x4, y4, x2, y2);
+
+    // General case
+    if (o1 != o2 && o3 != o4) return true;
+
+    // Special cases: check if points are collinear and lie on the segment
+    auto onSegment = [](double x1, double y1, double x2, double y2, double x3, double y3) {
+        return x3 >= min(x1, x2) && x3 <= max(x1, x2) &&
+               y3 >= min(y1, y2) && y3 <= max(y1, y2);
+    };
+
+    if (o1 == 0 && onSegment(x1, y1, x2, y2, x3, y3)) return true;
+    if (o2 == 0 && onSegment(x1, y1, x2, y2, x4, y4)) return true;
+    if (o3 == 0 && onSegment(x3, y3, x4, y4, x1, y1)) return true;
+    if (o4 == 0 && onSegment(x3, y3, x4, y4, x2, y2)) return true;
+
+    return false;
+}
+
+//Polygone Area
+double polygonArea(const vector<pair<double, double>>& vertices) {
+    int n = vertices.size();
+    double area = 0.0;
+    for (int i = 0; i < n; ++i) {
+        area += cross(vertices[i].first, vertices[i].second,
+                      vertices[(i + 1) % n].first, vertices[(i + 1) % n].second);
+    }
+    return fabs(area) / 2.0;
+}
+
+//Check point in polygone
+bool pointInPolygon(double x, double y, const vector<pair<double, double>>& vertices) {
+    int n = vertices.size(), count = 0;
+    for (int i = 0; i < n; ++i) {
+        double x1 = vertices[i].first, y1 = vertices[i].second;
+        double x2 = vertices[(i + 1) % n].first, y2 = vertices[(i + 1) % n].second;
+
+        if (orientation(x1, y1, x2, y2, x, y) == 0 &&
+            x >= min(x1, x2) && x <= max(x1, x2) &&
+            y >= min(y1, y2) && y <= max(y1, y2)) {
+            return true; // Point is on a boundary
+        }
+        if (y1 > y2) swap(x1, x2), swap(y1, y2);
+        if (y > y1 && y <= y2 && cross(x2 - x1, y2 - y1, x - x1, y - y1) > 0) {
+            count++;
+        }
+    }
+    return count % 2 == 1; // Inside if count is odd
+}
+
+
+//Circle line intersection
+bool circleLineIntersection(double cx, double cy, double r,
+                            double a, double b, double c,
+                            pair<double, double>& p1, pair<double, double>& p2) {
+    double dist = fabs(a * cx + b * cy + c) / hypot(a, b);
+    if (dist > r) return false; // No intersection
+
+    double d = sqrt(r * r - dist * dist);
+    double baseX = cx - a * (a * cx + b * cy + c) / (a * a + b * b);
+    double baseY = cy - b * (a * cx + b * cy + c) / (a * a + b * b);
+
+    double offsetX = -b * d / hypot(a, b);
+    double offsetY = a * d / hypot(a, b);
+
+    p1 = {baseX + offsetX, baseY + offsetY};
+    p2 = {baseX - offsetX, baseY - offsetY};
+    return true;
+}
+
+
+//Circle circle
+bool circleCircleIntersection(double x1, double y1, double r1,
+                              double x2, double y2, double r2,
+                              pair<double, double>& p1, pair<double, double>& p2) {
+    double d = dist(x1, y1, x2, y2);
+    if (d > r1 + r2 || d < fabs(r1 - r2)) return false; // No intersection
+
+    double a = (r1 * r1 - r2 * r2 + d * d) / (2 * d);
+    double h = sqrt(r1 * r1 - a * a);
+
+    double midX = x1 + a * (x2 - x1) / d;
+    double midY = y1 + a * (y2 - y1) / d;
+
+    double offsetX = h * (y2 - y1) / d;
+    double offsetY = h * (x2 - x1) / d;
+
+    p1 = {midX + offsetX, midY - offsetY};
+    p2 = {midX - offsetX, midY + offsetY};
+    return true;
+}
+
+//2seg intersection code
+void solve() {
+    const double EPS = 1e-9; 
+ 
+    double x1, y1, x2, y2, x3, y3, x4, y4;
+    cin >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4;
+ 
+    vector<double> a = {x1, y1};
+    vector<double> b = {x2, y2};
+    vector<double> c = {x3, y3};
+    vector<double> d = {x4, y4};
+ 
+    vector<double> ab = diff(a, b);
+    vector<double> cd = diff(c, d);
+ 
+    double abcd = cross(ab, cd);
+ 
+    if (fabs(abcd) < EPS) { 
+        vector<double> ac = diff(a, c);
+        vector<double> ad = diff(a, d);
+        vector<double> bc = diff(b, c);
+        vector<double> bd = diff(b, d);
+ 
+        if (cross(ac, ad) == 0 && cross(bc, bd) == 0) { 
+            if (min(x1, x2) <= max(x3, x4) + EPS && min(x3, x4) <= max(x1, x2) + EPS &&
+                min(y1, y2) <= max(y3, y4) + EPS && min(y3, y4) <= max(y1, y2) + EPS) {
+                cout << "YES" << endl;
+            } else {
+                cout << "NO" << endl;
+            }
+        } else {
+            cout << "NO" << endl;
+        }
+    } else {
+        vector<double> ac = diff(a, c);
+        double t1 = cross(ac, cd) / abcd;
+        double t2 = -1.0 * cross(ab, ac) / abcd;
+ 
+        if (0 <= t1 && t1 <= 1 && 0 <= t2 && t2 <= 1) {
+            cout << "YES" << endl;
+        } else {
+            cout << "NO" << endl;
+        }
+    }
+}
